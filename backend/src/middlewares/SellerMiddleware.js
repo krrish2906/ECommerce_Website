@@ -1,4 +1,6 @@
-export const validateUserInfo = (req, res, next) => {
+import { verifyToken } from '../utils/passwordUtils.js';
+
+export const validateSellerInfo = (req, res, next) => {
     if(!req.body) {
         return res.status(400).json({
             data: {},
@@ -8,8 +10,8 @@ export const validateUserInfo = (req, res, next) => {
         });
     }
 
-    const { name, email, password } = req.body;
-    if(!name || !email || !password) {
+    const { name, email, password, storeName } = req.body;
+    if(!name || !email || !password || !storeName) {
         return res.status(400).json({
             data: {},
             success: false,
@@ -20,7 +22,7 @@ export const validateUserInfo = (req, res, next) => {
     next();
 }
 
-export const validateUserLoginInfo = (req, res, next) => {
+export const validateSellerLoginInfo = (req, res, next) => {
     if(!req.body) {
         return res.status(400).json({
             data: {},
@@ -42,7 +44,7 @@ export const validateUserLoginInfo = (req, res, next) => {
     next();
 }
 
-export const isAuthenticated = (req, res, next) => {
+export const isSellerAuthenticated = (req, res, next) => {
     const token = req.cookies.jwt;
     if(!token) {
         return res.status(401).json({
@@ -63,6 +65,17 @@ export const isAuthenticated = (req, res, next) => {
                 error: 'Invalid token'
             });
         }
+
+        // Check if user is a seller
+        if(response.role !== 'seller') {
+            return res.status(403).json({
+                data: {},
+                success: false,
+                message: 'Access denied. Only sellers can access this resource.',
+                error: 'Forbidden'
+            });
+        }
+
         req.user = response;
         next();
     } catch (error) {

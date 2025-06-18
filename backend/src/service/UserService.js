@@ -25,7 +25,8 @@ class UserService {
             // Generate token
             const payload = {
                 userId: user._id,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
             const token = generateToken(payload);
 
@@ -63,7 +64,8 @@ class UserService {
             // Generate token
             const payload = {
                 userId: user._id,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
             const token = generateToken(payload);
 

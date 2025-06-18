@@ -1,9 +1,9 @@
-import UserService from "../service/UserService.js";
-const userService = new UserService();
+import SellerService from "../service/SellerService.js";
+const sellerService = new SellerService();
 
-export const signup = async (req, res) => {
+export const signupSeller = async (req, res) => {
     try {
-        const { userResponse, token } = await userService.createUser(req.body);
+        const { userResponse, seller, token } = await sellerService.createSeller(req.body);
         res.cookie('jwt', token, {
             maxAge: 2 * 24 * 60 * 60 * 1000,
             httpOnly: true,
@@ -11,9 +11,9 @@ export const signup = async (req, res) => {
             secure: process.env.NODE_ENV !== 'development'
         });
         return res.status(201).json({
-            data: userResponse,
+            data: { user: userResponse, seller },
             success: true,
-            message: 'Account created successfully',
+            message: 'Seller account created successfully',
             error: null
         });
     } catch (error) {
@@ -26,9 +26,9 @@ export const signup = async (req, res) => {
     }
 }
 
-export const login = async (req, res) => {
+export const loginSeller = async (req, res) => {
     try {
-        const { userResponse, token } = await userService.signin(req.body);
+        const { userResponse, seller, token } = await sellerService.signin(req.body);
         res.cookie('jwt', token, {
             maxAge: 2 * 24 * 60 * 60 * 1000,
             httpOnly: true,
@@ -36,9 +36,9 @@ export const login = async (req, res) => {
             secure: process.env.NODE_ENV !== 'development'
         });
         return res.status(200).json({
-            data: userResponse,
+            data: { user: userResponse, seller },
             success: true,
-            message: 'User logged in successfully',
+            message: 'Seller logged in successfully',
             error: null
         });
     } catch (error) {
@@ -59,7 +59,7 @@ export const login = async (req, res) => {
     }
 }
 
-export const logout = (req, res) => {
+export const logoutSeller = (req, res) => {
     try {
         res.clearCookie('jwt', {
             httpOnly: true,
@@ -69,7 +69,7 @@ export const logout = (req, res) => {
         return res.status(200).json({
             data: {},
             success: true,
-            message: 'User logged out successfully',
+            message: 'Seller logged out successfully',
             error: null
         });
     } catch (error) {
@@ -82,20 +82,29 @@ export const logout = (req, res) => {
     }
 }
 
-export const checkAuth = (req, res) => {
+export const checkSellerAuth = (req, res) => {
     try {
+        // Check if user is a seller
+        if (req.user.role !== 'seller') {
+            return res.status(403).json({
+                data: {},
+                success: false,
+                message: 'Access denied. Only sellers can access this resource.',
+                error: 'Forbidden'
+            });
+        }
         return res.status(200).json({
             data: req.user,
             success: true,
-            message: 'User Authenticated',
+            message: 'Seller Authenticated',
             error: null
         });
     } catch (error) {
         return res.status(500).json({
             data: {},
             success: false,
-            message: 'Failed to authenticate user',
+            message: 'Failed to authenticate seller',
             error: error.message
         });
     }
-}
+} 
