@@ -11,7 +11,7 @@ class UserService {
         try {
             // Find User
             const existingUser = await this.userRepository.findByEmail(data.email);
-            if (user) {
+            if (existingUser) {
                 throw new Error('User already exists!');
             }
 

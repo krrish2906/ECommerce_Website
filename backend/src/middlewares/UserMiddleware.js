@@ -8,8 +8,8 @@ export const validateUserInfo = (req, res, next) => {
         });
     }
 
-    const { username, email, password } = req.body;
-    if(!username || !email || !password) {
+    const { name, email, password } = req.body;
+    if(!name || !email || !password) {
         return res.status(400).json({
             data: {},
             success: false,

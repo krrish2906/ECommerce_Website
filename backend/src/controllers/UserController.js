@@ -1,4 +1,4 @@
-import UserService from "../services/UserService.js";
+import UserService from "../service/UserService.js";
 const userService = new UserService();
 
 export const signup = async (req, res) => {
@@ -30,7 +30,7 @@ export const login = async (req, res) => {
     try {
         const { userResponse, token } = await userService.signin(req.body);
         res.cookie('jwt', token, {
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 2 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             sameSite: 'strict',
             secure: process.env.NODE_ENV !== 'development'
