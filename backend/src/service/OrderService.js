@@ -50,14 +50,20 @@ class OrderService {
     
     async getOrdersBySellerId(sellerId) {
         try {
-            console.log(sellerId)
             const orders = await this.orderRepository.findAllOrders();
-            const sellerOrders = orders.filter(order => {
-                console.log(order.items)
-                console.log('\n\n\n\n\n\n')
+            const sellerOrders = orders.filter(order =>
                 order.items.some(item =>
-                    item.product && item.product.seller && item.product.seller === sellerId
+                    item.product && item.product.seller && item.product.seller.toString() === sellerId
                 )
+            ).map(order => {
+                // Filter items to only those belonging to seller with sellerId;
+                const filteredItems = order.items.filter(item =>
+                    item.product && item.product.seller && item.product.seller.toString() === sellerId
+                );
+                return {
+                    ...order.toObject(),
+                    items: filteredItems
+                };
             });
             return sellerOrders;
         } catch (error) {
