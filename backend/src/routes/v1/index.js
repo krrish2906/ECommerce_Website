@@ -31,4 +31,12 @@ router.get('/products', getAllProducts);
 router.get('/product/:id', getProductById);
 router.patch('/product/:id/stock', isSellerAuthenticated, updateStock);
 
+
+// Address Middlewares, Controllers & Routes:-
+import { validateAddressInfo } from '../../middlewares/AddressMiddleware.js';
+import { addAddress, getAddressesByUserId } from '../../controllers/AddressController.js';
+
+router.post('/address/add', isAuthenticated, validateAddressInfo, addAddress);
+router.get('/address/user/:userId', isAuthenticated, getAddressesByUserId);
+
 export default router;
