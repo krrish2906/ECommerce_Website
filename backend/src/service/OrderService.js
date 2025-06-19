@@ -47,4 +47,23 @@ class OrderService {
             throw error;
         }
     }
+    
+    async getOrdersBySellerId(sellerId) {
+        try {
+            console.log(sellerId)
+            const orders = await this.orderRepository.findAllOrders();
+            const sellerOrders = orders.filter(order => {
+                console.log(order.items)
+                console.log('\n\n\n\n\n\n')
+                order.items.some(item =>
+                    item.product && item.product.seller && item.product.seller === sellerId
+                )
+            });
+            return sellerOrders;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
+
+export default OrderService;

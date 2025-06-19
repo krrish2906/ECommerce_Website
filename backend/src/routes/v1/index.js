@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
+
 // User Middlewares, Controllers & Routes:-
 import { validateUserInfo, validateUserLoginInfo, isAuthenticated } from '../../middlewares/UserMiddleware.js'
 import { signup, login, logout, checkAuth } from '../../controllers/UserController.js';
@@ -38,5 +39,15 @@ import { addAddress, getAddressesByUserId } from '../../controllers/AddressContr
 
 router.post('/address/add', isAuthenticated, validateAddressInfo, addAddress);
 router.get('/address/user/:userId', isAuthenticated, getAddressesByUserId);
+
+
+// Order Middlewares, Controllers & Routes:-
+import { validatePlaceCODOrder } from '../../middlewares/OrderMiddleware.js';
+import { placeCashOnDeliveryOrder, getOrdersByUserId, getOrdersBySellerId } from '../../controllers/OrderController.js';
+
+router.post('/order/place-cod', isAuthenticated, validatePlaceCODOrder, placeCashOnDeliveryOrder);
+router.get('/orders/user/:userId', isAuthenticated, getOrdersByUserId);
+router.get('/orders/seller/:sellerId', isSellerAuthenticated, getOrdersBySellerId);
+
 
 export default router;
