@@ -20,4 +20,15 @@ router.post('/seller/login', validateSellerLoginInfo, loginSeller);
 router.post('/seller/logout', isSellerAuthenticated, logoutSeller);
 router.get('/seller/auth/verify', isSellerAuthenticated, checkSellerAuth);
 
+
+// Product Middlewares, Controllers & Routes:-
+import { validateProductInfo } from '../../middlewares/ProductMiddleware.js';
+import { multiUploader } from '../../middlewares/MulterMiddleware.js';
+import { addProduct, getAllProducts, getProductById, updateStock } from '../../controllers/ProductController.js';
+
+router.post('/product/add', multiUploader, isSellerAuthenticated, validateProductInfo, addProduct);
+router.get('/products', getAllProducts);
+router.get('/product/:id', getProductById);
+router.patch('/product/:id/stock', isSellerAuthenticated, updateStock);
+
 export default router;

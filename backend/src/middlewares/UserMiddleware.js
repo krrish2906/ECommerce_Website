@@ -1,3 +1,5 @@
+import { verifyToken } from '../utils/passwordUtils.js';
+
 export const validateUserInfo = (req, res, next) => {
     if(!req.body) {
         return res.status(400).json({
