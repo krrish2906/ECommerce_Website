@@ -28,7 +28,7 @@ function ProductsList() {
         if(isSeller) {
             fetchSellerProducts();
         }
-    }, [sellerProducts, fetchSellerProducts, isSeller]);
+    }, [fetchSellerProducts, isSeller]);
 
     return (
         <div className="no-scrollbar flex-1 h-[95vh] overflow-y-scroll flex flex-col justify-between">

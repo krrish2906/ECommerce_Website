@@ -1,6 +1,6 @@
 import UserRepository from "../repository/UserRepository.js";
 import { hashPassword, generateToken, comparePassword } from '../utils/passwordUtils.js';
-import { AppError, AuthenticationError, NotFoundError, ValidationError } from '../utils/errors.js'
+import { AuthenticationError, NotFoundError, AlreadyExistsError } from '../utils/errors.js'
 
 class UserService {
     constructor() {
@@ -12,7 +12,7 @@ class UserService {
             // Find User
             const existingUser = await this.userRepository.findByEmail(data.email);
             if (existingUser) {
-                throw new Error('User already exists!');
+                throw new AlreadyExistsError('User already exists!');
             }
 
             // Hash password
@@ -34,6 +34,7 @@ class UserService {
             const { password, ...userResponse } = user.toObject();
             return { userResponse, token };
         } catch (error) {
+            if(error.isOperational) throw error;
             throw new Error(`Error creating user: ${error.message}`);
         }
     }

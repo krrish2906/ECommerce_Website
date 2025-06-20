@@ -17,7 +17,7 @@ function ProductCard({ product }) {
             <div className="group cursor-pointer flex items-center justify-center px-2">
                 <img
                     className="group-hover:scale-105 transition max-w-26 md:max-w-36"
-                    src={product.image[0]} alt={product.name}
+                    src={product.images[0]} alt={product.name}
                 />
             </div>
             <div className="text-gray-500/60 text-sm">
@@ -38,7 +38,7 @@ function ProductCard({ product }) {
                 </div>
                 <div className="flex items-end justify-between mt-3">
                     <p className="md:text-xl text-base font-medium text-primary">
-                        { currency }{ product.offerPrice } { " " }
+                        { currency }{ product.offerPrice || product.price } { " " }
                         <span className="text-gray-500/60 md:text-sm text-xs line-through">
                             { currency }{ product.price }
                         </span>

@@ -17,6 +17,14 @@ export const signup = async (req, res) => {
             error: null
         });
     } catch (error) {
+        if(error.isOperational) {
+            return res.status(error.statusCode).json({
+                data: {},
+                success: false,
+                message: error.message,
+                error: error.message
+            });
+        }
         return res.status(500).json({
             data: {},
             success: false,
@@ -82,10 +90,12 @@ export const logout = (req, res) => {
     }
 }
 
-export const checkAuth = (req, res) => {
+export const checkAuth = async (req, res) => {
     try {
+        const userId = req.user.userId;
+        const user = await userService.getUserById(userId);
         return res.status(200).json({
-            data: req.user,
+            data: user,
             success: true,
             message: 'User Authenticated',
             error: null

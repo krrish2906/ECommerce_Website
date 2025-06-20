@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { useAppContext } from '../contexts/AppContext';
+import toast from 'react-hot-toast';
 
 function Login() {
-    const { setShowUserLogin, setUser } = useAppContext();
+    const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
     const [state, setState] = useState("login");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -10,11 +11,26 @@ function Login() {
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
-        setUser({
-            email: 'krish@gmail.com',
-            name: 'Krish Bansal'
-        });
-        setShowUserLogin(false);
+        try {
+            const { data } = await axios.post(`/api/v1/user/${state}`, { name, email, password }, {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
+
+            if(data.success) {
+                navigate('/');
+                setUser(data.data);
+                setShowUserLogin(false);
+                toast.success(data.message);
+            } else {
+                setUser(null);
+                setShowUserLogin(true);
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     return (
@@ -24,7 +40,7 @@ function Login() {
                     <span className="text-primary">User</span> {state === "login" ? "Login" : "Sign Up"}
                 </p>
                 {
-                    state === "register" && (
+                    state === "signup" && (
                         <div className="w-full">
                             <p>Name</p>
                             <input
@@ -47,7 +63,7 @@ function Login() {
                     <input onChange={(e) => setPassword(e.target.value)} value={password} placeholder="password" className="border border-gray-300 rounded w-full p-2 mt-1 outline-primary" type="password" required />
                 </div>
                 {  
-                    state === "register" ? (
+                    state === "signup" ? (
                         <p>
                             Already have an account? {" "}
                             <span onClick={() => setState("login")} className="text-primary cursor-pointer">
@@ -57,7 +73,7 @@ function Login() {
                     ) : (
                         <p>
                             Create an account? {" "}
-                            <span onClick={() => setState("register")} className="text-primary cursor-pointer">
+                            <span onClick={() => setState("signup")} className="text-primary cursor-pointer">
                                 click here
                             </span>
                         </p>
@@ -65,7 +81,7 @@ function Login() {
                 }
                 <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
                     {
-                        state === "register" ? "Create Account" : "Login"
+                        state === "signup" ? "Create Account" : "Login"
                     }
                 </button>
             </form>

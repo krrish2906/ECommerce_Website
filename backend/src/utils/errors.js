@@ -30,3 +30,9 @@ export class InternalServerError extends AppError {
         super(message, 500);
     }
 }
+
+export class AlreadyExistsError extends AppError {
+    constructor(message = 'Resource already exists') {
+        super(message, 409);
+    }
+}

@@ -35,13 +35,37 @@ export const AppContextProvider = ({ children }) => {
                 setIsSeller(false);
             }
         } catch (error) {
-            console.log(error);
+            error;
             setIsSeller(false);
+        }
+    }
+    
+    const fetchUserStatus = async () => {
+        try {
+            const { data } = await axios.get('/api/v1/user/auth/verify');
+            if(data.success) {
+                setUser(data.data);
+                setCartItems(data.data.cart);
+            } else {
+                setUser(null);
+            }
+        } catch (error) {
+            error;
+            setUser(null);
         }
     }
 
     const fetchProducts = async () => {
-        setProducts(dummyProducts);
+        try {
+            const { data } = await axios.get(`/api/v1/products`);
+            if(data.success) {
+                setProducts(data.data);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
     
     const fetchSellerProducts = async () => {
@@ -106,11 +130,14 @@ export const AppContextProvider = ({ children }) => {
         setCartItems(cartData);
     }
 
+
     // useEffect:-
     useEffect(() => {
         fetchSellerStatus();
+        fetchUserStatus();
         fetchProducts();
-    }, [])
+    }, []);
+
 
     const value = {
         navigate, axios,
