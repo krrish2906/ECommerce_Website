@@ -6,11 +6,11 @@ const addressSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    firstName: {
+    firstname: {
         type: String,
         required: true
     },
-    lastName: {
+    lastname: {
         type: String,
         required: true
     },

@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { assets } from '../assets/assets'
+import { useAppContext } from '../contexts/AppContext';
+import toast from 'react-hot-toast';
 
 function Input({ type, placeholder, name, handleChange, address }) {
     return (
@@ -16,6 +18,7 @@ function Input({ type, placeholder, name, handleChange, address }) {
 }
 
 function AddressPage() {
+    const { axios, navigate, user } = useAppContext();
 
     const [address, setAddress] = useState({
         firstname: '',
@@ -39,7 +42,31 @@ function AddressPage() {
 
     const submitHandler = async (event) => {
         event.preventDefault();
+        try {
+            const { data } = await axios.post('/api/v1/address/add', address, {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
+
+            if(data.success) {
+                console.log(data.data)
+                toast.success(data.message);
+                navigate('/cart');
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
+
+    useEffect(() => {
+        if(!user) {
+            toast.error('Please sign in to continue!');
+            navigate('/cart');
+        }
+    }, [])
 
     return (
         <div className='mt-12 pb-16'>

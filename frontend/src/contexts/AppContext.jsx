@@ -186,7 +186,7 @@ export const AppContextProvider = ({ children }) => {
         isSeller, setIsSeller,
         showUserLogin, setShowUserLogin,
         products, sellerProducts, fetchSellerProducts,
-        cartItems, currency,
+        cartItems, currency, setCartItems,
         addToCart, updateCartItem, removeFromCart,
         getCartItemsCount, getCartTotalAmount,
         searchQuery, setSearchQuery

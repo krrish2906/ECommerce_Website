@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../contexts/AppContext';
-import { assets, dummyAddress } from '../assets/assets';
+import { assets } from '../assets/assets';
+import toast from 'react-hot-toast';
 
 function CartPage() {
-    const { products, currency, cartItems, navigate,
+    const {
+        products, currency, cartItems, setCartItems, navigate, axios, user,
         removeFromCart, getCartItemsCount, getCartTotalAmount, updateCartItem
     } = useAppContext();
 
     const [cart, setCart] = useState([]);
-    const [addresses, setAddresses] = useState(dummyAddress);
+    const [addresses, setAddresses] = useState([]);
     const [showAddress, setShowAddress] = useState(false);
-    const [selectedAddress, setSelectedAddress] = useState(dummyAddress[0]);
+    const [selectedAddress, setSelectedAddress] = useState(null);
     const [paymentOption, setPaymentOption] = useState("Cash On Delivery");
 
     const getCart = () => {
@@ -25,8 +27,62 @@ function CartPage() {
         setCart(array);
     }
 
+    const getUserAddress = async (userId) => {
+        try {
+            const { data } = await axios.get(`/api/v1/address/user/${userId}`)
+            if(data.success) {
+                const fetchedAddresses = data.data;
+                setAddresses(fetchedAddresses);
+                if(fetchedAddresses.length > 0) {
+                    setSelectedAddress(fetchedAddresses[fetchedAddresses.length - 1]);
+                }
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+    
     const placeOrder = async () => {
-        
+        try {
+            // If address isn't selected;
+            if(!selectedAddress) {
+                return toast.error('Please select delivery address');
+            }
+
+            // prepare Order Data;
+            const orderData = {
+                address: selectedAddress._id,
+                items: cart.map(item => ({
+                    product: item._id,
+                    quantity: item.quantity
+                }))
+            };
+
+            if(paymentOption === "Cash On Delivery") {
+                // Cash on Delivery Order Api Call;
+                const { data } = await axios.post('/api/v1/order/place-cod', { ...orderData }, {
+                    validateStatus: function (status) {
+                        return status < 500; 
+                    }
+                });
+
+                if (data.success) {
+                    toast.success(data.message);
+                    setCartItems({});
+                    navigate('/myorders')
+                } else {
+                    toast.error(data.message);
+                }
+            }
+            else {
+                // Online Payment Order Api Call;
+                // do something;
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     useEffect(() => {
@@ -34,6 +90,12 @@ function CartPage() {
             getCart();
         }
     }, [products, cartItems]);
+
+    useEffect(() => {
+        if (user) {
+            getUserAddress(user._id);
+        }
+    }, [user])
 
     return products.length > 0 && cartItems ? (
         <div className="flex flex-col md:flex-row mt-16">
