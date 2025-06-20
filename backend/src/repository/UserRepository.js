@@ -14,6 +14,15 @@ class UserRepository extends CrudRepository {
             throw new Error(`Error finding user by email: ${error.message}`);
         }
     }
+
+    async updateUserCart(userId, cartData) {
+        try {
+            const user = await User.findByIdAndUpdate(userId, { cart: cartData }, { new: true });
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default UserRepository;

@@ -78,6 +78,15 @@ class UserService {
             throw new Error(`Error signing in user: ${error.message}`);
         }
     }
+
+    async updateUserCart(userId, cartData) {
+        try {
+            const updatedUser = await this.userRepository.updateUserCart(userId, cartData);
+            return updatedUser;
+        } catch (error) {
+            throw new Error(`Error updating user cart: ${error.message}`);
+        }
+    }
 }
 
 export default UserService;

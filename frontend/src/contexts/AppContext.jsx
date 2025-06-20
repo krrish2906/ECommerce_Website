@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom'
 import { dummyProducts } from "../assets/assets";
 import { toast } from 'react-hot-toast'
@@ -12,6 +12,7 @@ export const AppContext = createContext();
 export const AppContextProvider = ({ children }) => {
     
     const currency = import.meta.env.VITE_CURRENCY;
+    const isFirstCartSync = useRef(true);
 
     // Navigate:-
     const navigate = useNavigate();
@@ -24,6 +25,7 @@ export const AppContextProvider = ({ children }) => {
     const [sellerProducts, setSellerProducts] = useState([]);
     const [cartItems, setCartItems] = useState({});
     const [searchQuery, setSearchQuery] = useState({});
+
 
     // Functions:-
     const fetchSellerStatus = async () => {
@@ -44,8 +46,14 @@ export const AppContextProvider = ({ children }) => {
         try {
             const { data } = await axios.get('/api/v1/user/auth/verify');
             if(data.success) {
+                // set User:-
                 setUser(data.data);
-                setCartItems(data.data.cart);
+                const cartObj = {};
+                data.data.cart.forEach(item => {
+                    cartObj[item.product] = item.quantity;
+                });
+                // set Cart:-
+                setCartItems(cartObj);
             } else {
                 setUser(null);
             }
@@ -83,8 +91,10 @@ export const AppContextProvider = ({ children }) => {
 
     const getCartItemsCount = () => {
         let totalCount = 0;
-        for(const item in cartItems) {
-            totalCount += cartItems[item];
+        if(cartItems) {
+            for(const item in cartItems) {
+                totalCount += cartItems[item];
+            }
         }
         return totalCount;
     }
@@ -93,8 +103,8 @@ export const AppContextProvider = ({ children }) => {
         let totalCost = 0;
         for(const item in cartItems) {
             let itemInfo = products.find((product) => product._id === item);
-            if(cartItems[item] > 0) {
-                totalCost += cartItems[item] * itemInfo.offerPrice;
+            if(itemInfo && cartItems[item] > 0) {
+                totalCost += cartItems[item] * (itemInfo.offerPrice || itemInfo.price);
             }
         }
         return Math.floor(totalCost * 100 ) / 100;
@@ -137,6 +147,37 @@ export const AppContextProvider = ({ children }) => {
         fetchUserStatus();
         fetchProducts();
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            if (isFirstCartSync.current) {
+                isFirstCartSync.current = false;
+                return;
+            }
+            const updateUserCartItems = async () => {
+                try {
+                    const cartData = Object.entries(cartItems).filter(([product, quantity]) => product && quantity > 0)
+                    .map(([product, quantity]) => ({
+                        product,
+                        quantity
+                    }));
+
+                    const { data } = await axios.patch('/api/v1/user/cart', { cartData }, {
+                        validateStatus: function (status) {
+                            return status < 500; 
+                        }
+                    });
+                    
+                    if(!data.success) {
+                        toast.error(data.message);
+                    }
+                } catch (error) {
+                    toast.error(error.message);
+                }
+            }
+            updateUserCartItems();
+        }
+    }, [cartItems, user]);
 
 
     const value = {

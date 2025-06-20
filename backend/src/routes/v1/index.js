@@ -4,12 +4,13 @@ const router = express.Router();
 
 // User Middlewares, Controllers & Routes:-
 import { validateUserInfo, validateUserLoginInfo, isAuthenticated } from '../../middlewares/UserMiddleware.js'
-import { signup, login, logout, checkAuth } from '../../controllers/UserController.js';
+import { signup, login, logout, checkAuth, updateUserCart } from '../../controllers/UserController.js';
 
 router.post('/user/signup', validateUserInfo, signup);
 router.post('/user/login', validateUserLoginInfo, login);
 router.post('/user/logout', isAuthenticated, logout);
 router.get('/user/auth/verify', isAuthenticated, checkAuth);
+router.patch('/user/cart', isAuthenticated, updateUserCart);
 
 
 // Seller Middlewares, Controllers & Routes:-

@@ -15,10 +15,12 @@ function CartPage() {
 
     const getCart = () => {
         let array = [];
-        for(const key in cartItems) {
-            const product = products.find((item) => item._id === key);
-            product.quantity = cartItems[key];
-            array.push(product);
+        if(cartItems) {
+            for(const key in cartItems) {
+                const product = products.find((item) => item._id === key);
+                product.quantity = cartItems[key];
+                array.push(product);
+            }
         }
         setCart(array);
     }
@@ -37,9 +39,9 @@ function CartPage() {
         <div className="flex flex-col md:flex-row mt-16">
             <div className='flex-1 max-w-4xl'>
                 <h1 className="text-3xl font-medium mb-6">
-                    Shopping Cart
-                    <span className="text-sm text-primary">
-                        { getCartItemsCount() } Items
+                    Shopping Cart {" "}
+                    <span className="text-[16px] text-primary pl-2">
+                        { `(${ getCartItemsCount() } Items)` }
                     </span>
                 </h1>
 
@@ -62,7 +64,7 @@ function CartPage() {
                                     navigate(`/products/${product.category.toLowerCase()}/${product._id}`);
                                     scrollTo(0,0);
                                 }}>
-                                    <img className="max-w-full h-full object-cover" src={product.image[0]} alt={product.name} />
+                                    <img className="max-w-full h-full object-cover" src={product.images[0]} alt={product.name} />
                                 </div>
 
                                 {/*  */}
@@ -93,7 +95,9 @@ function CartPage() {
                             </div>
 
                             {/*  */}
-                            <p className="text-center">{currency}{product.offerPrice * product.quantity}</p>
+                            <p className="text-center">
+                                { currency }{ (product.offerPrice || product.price) * product.quantity }
+                            </p>
                             <button onClick={() => removeFromCart(product._id)} className="cursor-pointer mx-auto">
                                 <img src={assets.remove_icon} alt="remove" className='inline-block w-6 h-6' />
                             </button>

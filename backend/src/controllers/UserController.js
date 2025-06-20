@@ -109,3 +109,24 @@ export const checkAuth = async (req, res) => {
         });
     }
 }
+
+export const updateUserCart = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { cartData } = req.body;
+        const updatedUser = await userService.updateUserCart(userId, cartData);
+        return res.status(200).json({
+            data: updatedUser,
+            success: true,
+            message: 'User cart updated successfully',
+            error: null
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: {},
+            success: false,
+            message: 'Failed to update user cart',
+            error: error.message
+        });
+    }
+}

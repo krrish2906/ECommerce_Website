@@ -21,7 +21,7 @@ function ProductDetails() {
     }, [products]);
 
     useEffect(() => {
-        setThumbnail(product?.image[0] ? product.image[0] : null);
+        setThumbnail(product?.images[0] ? product.images[0] : null);
     }, [product])
 
     return product && (
@@ -37,7 +37,7 @@ function ProductDetails() {
                 <div className="flex gap-3">
                     <div className="flex flex-col gap-3">
                         {
-                            product.image.map((image, index) => (
+                            product.images.map((image, index) => (
                                 <div key={index}
                                 onClick={() => setThumbnail(image)}
                                 className="border max-w-24 border-gray-500/30 rounded overflow-hidden cursor-pointer" >
@@ -58,7 +58,7 @@ function ProductDetails() {
                     <div className="flex items-center gap-0.5 mt-1">
                         {
                             Array(5).fill('').map((item, idx) => (
-                                <img src={idx < 4 ? assets.star_icon : assets.star_dull_icon} alt="" className='md:w-4 w-3.5' />
+                                <img key={idx} src={idx < 4 ? assets.star_icon : assets.star_dull_icon} alt="" className='md:w-4 w-3.5' />
                             ))
                         }
                         <p className="text-base ml-2">(4)</p>
@@ -73,9 +73,12 @@ function ProductDetails() {
                     <p className="text-base font-medium mt-6">About Product</p>
                     <ul className="list-disc ml-4 text-gray-500/70">
                         {
-                            product.description.map((desc, index) => (
-                                <li key={index}>{ desc }</li>
-                            ))
+                            Array.isArray(product.description) ? 
+                                product.description.map((desc, index) => (
+                                    <li key={index}>{ desc }</li>
+                                ))
+                                :
+                                product.description
                         }
                     </ul>
 
