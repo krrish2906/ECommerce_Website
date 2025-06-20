@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../contexts/AppContext';
-import { dummyOrders } from '../assets/assets';
 import toast from 'react-hot-toast';
+import Moment from 'moment';
 
 function MyOrders() {
     const { currency, axios, user } = useAppContext();
@@ -60,15 +60,21 @@ function MyOrders() {
                                         </div>
 
                                         {/* Details section */}
-                                        <div className='flex flex-col justify-center md:ml-8 mb-4 md:mb-0'>
+                                        <div className='flex flex-col items-center justify-center md:ml-8 mb-4 md:mb-0'>
                                             <p>Quantity: { item.quantity || '1' }</p>
                                             <p>Status: { order.status }</p>
-                                            <p>Date: { new Date(order.createdAt).toLocaleDateString() }</p>
+                                            <p>Date: { Moment(order.createdAt).format('DD/MM/YYYY') }</p>
                                         </div>
-                                        <p className='text-primary text-lg font-medium'>
-                                            Amount: { currency }
-                                            { (item.product.offerPrice || item.product.price) * item.quantity }
-                                        </p>
+                                        <div className='flex flex-col items-center'>
+                                            <p className='text-primary text-lg font-medium'>
+                                                Amount: { currency }
+                                                { (item.product.offerPrice || item.product.price) * item.quantity }
+                                            </p>
+                                            <p className='text-orange-400 text-md font-medium'>
+                                                Tax: { currency }
+                                                { order.amount - (item.product.offerPrice || item.product.price) * item.quantity }
+                                            </p>
+                                        </div>
                                     </div>
                                 ))
                             }

@@ -60,9 +60,17 @@ class OrderService {
                 const filteredItems = order.items.filter(item =>
                     item.product && item.product.seller && item.product.seller.toString() === sellerId
                 );
+
+                // Calculate sellerAmount for these items (considers only base amount);
+                const sellerAmount = filteredItems.reduce((sum, item) => {
+                    const price = item.product.offerPrice || item.product.price;
+                    return sum + price * item.quantity;
+                }, 0);
+
                 return {
                     ...order.toObject(),
-                    items: filteredItems
+                    items: filteredItems,
+                    amount: sellerAmount
                 };
             });
             return sellerOrders;

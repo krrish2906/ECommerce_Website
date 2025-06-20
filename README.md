@@ -1,4 +1,3 @@
 to do:-
-- 1. order seller amount
-- 2. online payment integration
-- 3. fixes, clean up console logs (if any)
+- 1. online payment integration
+- 2. fixes, clean up console logs (if any)
