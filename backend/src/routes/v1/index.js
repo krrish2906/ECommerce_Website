@@ -49,7 +49,7 @@ import { placeCashOnDeliveryOrder, getOrdersByUserId, getOrdersBySellerId } from
 
 router.post('/order/place-cod', isAuthenticated, validatePlaceCODOrder, placeCashOnDeliveryOrder);
 router.get('/orders/user/:userId', isAuthenticated, getOrdersByUserId);
-router.get('/orders/seller/:sellerId', isSellerAuthenticated, getOrdersBySellerId);
+router.get('/orders/seller', isSellerAuthenticated, getOrdersBySellerId);
 
 
 export default router;

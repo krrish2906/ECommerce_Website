@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../contexts/AppContext';
 import { dummyOrders } from '../assets/assets';
+import toast from 'react-hot-toast';
 
 function MyOrders() {
-    const { currency } = useAppContext();
+    const { currency, axios, user } = useAppContext();
     const [myOrders, setMyOrders] = useState([]);
 
-    const fetchMyOrders = async () => {
-        setMyOrders(dummyOrders);
+    const fetchMyOrders = async (userId) => {
+        try {
+            const { data } = await axios.get(`/api/v1/orders/user/${userId}`);
+            if(data.success) {
+                setMyOrders(data.data);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     useEffect(() => {
-        fetchMyOrders();
-    }, [])
+        if (user) {
+            fetchMyOrders(user._id);
+        }
+    }, [user]);
 
     return (
         <div className='mt-16 pb-16'>
@@ -39,7 +51,7 @@ function MyOrders() {
                                         {/* Image Section */}
                                         <div className='flex items-center mb-4 md:mb-0'>
                                             <div className='bg-primary/10 p-4 rounded-lg'>
-                                                <img src={item.product.image[0]} alt="image" className='size-16' />
+                                                <img src={item.product.images[0]} alt="image" className='size-16' />
                                             </div>
                                             <div className='ml-4'>
                                                 <h2 className='text-xl font-medium text-gray-800'>{ item.product.name }</h2>
@@ -54,7 +66,8 @@ function MyOrders() {
                                             <p>Date: { new Date(order.createdAt).toLocaleDateString() }</p>
                                         </div>
                                         <p className='text-primary text-lg font-medium'>
-                                            Amount: { currency }{ item.product.offerPrice * item.quantity }
+                                            Amount: { currency }
+                                            { (item.product.offerPrice || item.product.price) * item.quantity }
                                         </p>
                                     </div>
                                 ))

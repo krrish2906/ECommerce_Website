@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../../contexts/AppContext';
-import { assets, dummyOrders } from '../../assets/assets';
+import { assets } from '../../assets/assets';
+import toast from 'react-hot-toast';
+import Moment from 'moment';
 
 function Orders() {
-    const { currency } = useAppContext();
+    const { currency, axios } = useAppContext();
     const [orders, setOrders] = useState([]);
 
     const fetchOrders = async () => {
-        setOrders(dummyOrders)
+        try {
+            const { data } = await axios.get(`/api/v1/orders/seller`);
+            if(data.success) {
+                setOrders(data.data);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
     
     useEffect(() => {
@@ -38,7 +49,7 @@ function Orders() {
                             </div>
 
                             <div className="text-sm md:text-base text-black/60">
-                                <p className='text-black/80'>{order.address.firstName} {order.address.lastName}</p>
+                                <p className='text-black/80'>{order.address.firstname} {order.address.lastname}</p>
                                 <p>{order.address.street}, {order.address.city}</p>
                                 <p>{order.address.state}, {order.address.zipcode}, {order.address.country}</p>
                                 <p>{order.address.phone}</p>
@@ -48,7 +59,7 @@ function Orders() {
 
                             <div className="flex flex-col text-sm md:text-base text-black/60">
                                 <p>Method: {order.paymentType}</p>
-                                <p>Date: { new Date(order.createdAt).toLocaleDateString() }</p>
+                                <p>Date: { Moment(order.createdAt).format('DD/MM/YYYY') }</p>
                                 <p>Payment: {order.isPaid ? "Paid" : "Pending"}</p>
                             </div>
                         </div>

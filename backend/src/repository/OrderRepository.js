@@ -8,7 +8,7 @@ class OrderRepository extends CrudRepository {
 
     async findOrdersByUserId(userId) {
         try {
-            const orders = await Order.find({ userId }).populate('items').populate('address');
+            const orders = await Order.find({ userId }).populate('items.product').populate('address');
             return orders;
         } catch (error) {
             throw new Error(`Error finding orders for user ${userId}: ${error.message}`);

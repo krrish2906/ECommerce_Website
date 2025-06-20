@@ -46,7 +46,7 @@ export const getOrdersByUserId = async (req, res) => {
 
 export const getOrdersBySellerId = async (req, res) => {
     try {
-        const { sellerId } = req.params;
+        const sellerId = req.user.userId;
         const orders = await orderService.getOrdersBySellerId(sellerId);
         return res.status(200).json({
             data: orders,
