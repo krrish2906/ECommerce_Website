@@ -28,7 +28,7 @@ import { multiUploader } from '../../middlewares/MulterMiddleware.js';
 import { addProduct, getAllProducts, getProductById, updateStock, getProductsBySellerId } from '../../controllers/ProductController.js';
 
 router.post('/product/add', multiUploader, isSellerAuthenticated, validateProductInfo, addProduct);
-router.get('/products/seller/:sellerId', isSellerAuthenticated, getProductsBySellerId);
+router.get('/products/seller', isSellerAuthenticated, getProductsBySellerId);
 router.get('/products', getAllProducts);
 router.get('/product/:id', getProductById);
 router.patch('/product/:id/stock', isSellerAuthenticated, updateStock);

@@ -15,11 +15,7 @@ function SellerLayout() {
 
     const logout = async () => {
         try {
-            const { data } = await axios.post('/api/v1/seller/logout', {}, {
-                validateStatus: function (status) {
-                    return status < 500; 
-                }
-            });
+            const { data } = await axios.post('/api/v1/seller/logout');
             if(data.success) {
                 toast.success(data.message);
                 navigate('/')
@@ -38,7 +34,7 @@ function SellerLayout() {
                     <img className="cursor-pointer w-34 md:w-48" src={assets.basket_logo} alt="logo" />
                 </Link>
                 <div className="flex items-center gap-5 text-gray-500">
-                    <p>Hi! Admin</p>
+                    <p>Hi Seller!</p>
                     <button onClick={logout} className='border rounded-full text-sm px-4 py-1'>
                         Logout
                     </button>

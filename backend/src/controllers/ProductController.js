@@ -104,7 +104,7 @@ export const updateStock = async (req, res) => {
 
 export const getProductsBySellerId = async (req, res) => {
     try {
-        const { sellerId } = req.params;
+        const sellerId = req.user.userId;
         const products = await productService.findProductsBySeller(sellerId);
         return res.status(200).json({
             data: products,
