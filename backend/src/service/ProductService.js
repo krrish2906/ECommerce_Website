@@ -44,6 +44,15 @@ class ProductService {
             throw error;
         }
     }
+
+    async findProductsBySeller(sellerId) {
+        try {
+            const products = await this.productRepository.findProductsBySellerId(sellerId);
+            return products;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ProductService;

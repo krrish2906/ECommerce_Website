@@ -25,9 +25,10 @@ router.get('/seller/auth/verify', isSellerAuthenticated, checkSellerAuth);
 // Product Middlewares, Controllers & Routes:-
 import { validateProductInfo } from '../../middlewares/ProductMiddleware.js';
 import { multiUploader } from '../../middlewares/MulterMiddleware.js';
-import { addProduct, getAllProducts, getProductById, updateStock } from '../../controllers/ProductController.js';
+import { addProduct, getAllProducts, getProductById, updateStock, getProductsBySellerId } from '../../controllers/ProductController.js';
 
 router.post('/product/add', multiUploader, isSellerAuthenticated, validateProductInfo, addProduct);
+router.get('/products/seller/:sellerId', isSellerAuthenticated, getProductsBySellerId);
 router.get('/products', getAllProducts);
 router.get('/product/:id', getProductById);
 router.patch('/product/:id/stock', isSellerAuthenticated, updateStock);

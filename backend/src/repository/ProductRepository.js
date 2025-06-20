@@ -14,6 +14,15 @@ class ProductRepository extends CrudRepository {
             throw error;
         }
     }
+
+    async findProductsBySellerId(sellerId) {
+        try {
+            const products = await Product.find({ seller: sellerId });
+            return products;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ProductRepository;

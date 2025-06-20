@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
 import { assets, categories } from '../../assets/assets';
+import { useAppContext } from '../../contexts/AppContext';
+import toast from 'react-hot-toast';
 
 function AddProduct() {
+    const { axios } = useAppContext();
+
+    const [isAdding, setIsAdding] = useState(false);
     const [files, setFiles] = useState([]);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -11,6 +16,41 @@ function AddProduct() {
 
     const submitHandler = async (event) => {
         event.preventDefault();
+        setIsAdding(true);
+        try {
+            const productData = {
+                name, description, category,
+                price, offerPrice
+            };
+
+            const formData = new FormData();
+            formData.append('productData', JSON.stringify(productData));
+            for(let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+            
+            const { data } = await axios.post('/api/v1/product/add', formData, {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
+            
+            if (data.success) {
+                toast.success(data.message);
+                setName('');
+                setDescription('');
+                setCategory('');
+                setPrice('');
+                setOfferPrice('');
+                setFiles([]);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setIsAdding(false);
+        }
     }
 
     return (
@@ -118,18 +158,21 @@ function AddProduct() {
                             type="number"
                             placeholder="0"
                             className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-                            required
                             value={offerPrice}
                             onChange={(e) => setOfferPrice(e.target.value)}
                         />
                     </div>
                 </div>
-                <button className="px-8 py-2.5 bg-primary hover:bg-primary-dull cursor-pointer text-white font-medium rounded">
-                    ADD
+                <button
+                className={`px-8 py-2.5  hover:bg-primary-dull cursor-pointer text-white font-medium rounded
+                ${ isAdding ? 'bg-gray-400 hover:bg-gray-400' : 'bg-primary' }`}>
+                    {
+                        isAdding ? 'ADDING...' :  'ADD'
+                    }
                 </button>
             </form>
         </div>
     );
 }
 
-export default AddProduct
+export default AddProduct;

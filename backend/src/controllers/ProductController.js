@@ -3,7 +3,8 @@ const productService = new ProductService();
 
 export const addProduct = async (req, res) => {
     try {
-        let productData = req.body;
+        let productData = req.body.productData;
+        productData.offerPrice = productData.offerPrice ? productData.offerPrice : productData.price;
         productData.seller = req.user.userId;
         if (req.files) {
             productData.images = [...req.files];
@@ -89,6 +90,26 @@ export const updateStock = async (req, res) => {
             data: updatedProduct,
             success: true,
             message: "Product stock updated successfully",
+            error: null
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: {},
+            success: false,
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+};
+
+export const getProductsBySellerId = async (req, res) => {
+    try {
+        const { sellerId } = req.params;
+        const products = await productService.findProductsBySeller(sellerId);
+        return res.status(200).json({
+            data: products,
+            success: true,
+            message: "Products fetched successfully",
             error: null
         });
     } catch (error) {
