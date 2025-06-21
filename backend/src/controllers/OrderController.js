@@ -89,12 +89,12 @@ export const placeOnlinePaymentOrder = async (req, res) => {
 
 export const verifyPayment = async (req, res) => {
     try {
-        const { orderId, paymentId, signature } = req.body;
-        const response = await orderService.validatePayment(orderId, paymentId, signature);
+        const paymentData = req.body;
+        const response = await orderService.validatePayment(paymentData);
         return res.status(200).json({
             data: response,
             success: response,
-            message: response ? "success" : "failed",
+            message: response ? "Payment verified successfully!" : "Payment verification failed!",
             error: null
         });
     } catch (error) {
@@ -106,3 +106,23 @@ export const verifyPayment = async (req, res) => {
         });
     }
 };
+
+export const trashOrderonFailure = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await orderService.trashOrder(id);
+        return res.status(200).json({
+            data: order,
+            success: true,
+            message: "Order trashed successfully",
+            error: null
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: {},
+            success: false,
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+}

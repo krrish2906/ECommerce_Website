@@ -55,7 +55,7 @@ router.get('/address/user/:userId', isAuthenticated, getAddressesByUserId);
 import { validateOrderDetails, validatePaymentVerification } from '../../middlewares/OrderMiddleware.js';
 import {
     placeCashOnDeliveryOrder, getOrdersByUserId, getOrdersBySellerId,
-    placeOnlinePaymentOrder, verifyPayment
+    placeOnlinePaymentOrder, verifyPayment, trashOrderonFailure
 } from '../../controllers/OrderController.js';
 
 router.get('/orders/user/:userId', isAuthenticated, getOrdersByUserId);
@@ -63,6 +63,7 @@ router.get('/orders/seller', isSellerAuthenticated, getOrdersBySellerId);
 router.post('/order/place-cod', isAuthenticated, validateOrderDetails, placeCashOnDeliveryOrder);
 router.post('/order/place-online', isAuthenticated, validateOrderDetails, placeOnlinePaymentOrder);
 router.post('/order/verify-payment', isAuthenticated, validatePaymentVerification, verifyPayment);
+router.delete('/order/:id/trash', isAuthenticated, trashOrderonFailure);
 
 
 export default router;

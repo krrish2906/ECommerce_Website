@@ -71,46 +71,78 @@ function CartPage() {
                 if (data.success) {
                     toast.success(data.message);
                     setCartItems({});
-                    navigate('/myorders')
+                    navigate('/myorders');
                 } else {
                     toast.error(data.message);
                 }
             }
             else {
                 // Online Payment Order Api Call;
-                const { data } = await axios.post('/api/v1/order/place-online', {
-                    amount: 500
+                const { data } = await axios.post('/api/v1/order/place-online', { ...orderData }, {
+                    validateStatus: function (status) {
+                        return status < 500; 
+                    }
                 });
-                console.log(data.data);
+
                 if(data.success) {
-                    const paymentObject = new window.Razorpay({
-                        key: "rzp_test_XUtnumsDkV4at8",
-                        order_id: data.data.id,
-                        ...data.data,
-                        handler: function(response) {
-                            console.log(response)
+                    const _id = data.data.order._id;
+                    const paymentGateway = new window.Razorpay({
+                        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                        amount: data.data.razorpayOrder.amount,
+                        currency: "INR",
+                        order_id: data.data.razorpayOrder.id,
+                        prefill: {
+                            name: user.name,
+                            email: user.email
+                        },
+                        theme: {
+                            color: "#4fbf8b"
+                        },
+                        handler: async function(response) {
                             const options = {
-                                order_id: response.razorpay_order_id,
-                                payment_id: response.razorpay_payment_id,
+                                orderId: response.razorpay_order_id,
+                                paymentId: response.razorpay_payment_id,
                                 signature: response.razorpay_signature,
+                                _id
                             }
-                            axios.post('/api/v1/order/verify-payment', options)
-                            .then((res) => {
-                                console.log(res)
-                                if(res.data.success) {
-                                    alert('Success');
+                            try {
+                                const { data } = await axios.post('/api/v1/order/verify-payment', options, {
+                                    validateStatus: function (status) {
+                                        return status < 500; 
+                                    }
+                                });
+                                
+                                if(data.success) {
+                                    toast.success(data.message);
+                                    setCartItems({});
+                                    navigate('/myorders');
                                 } else {
-                                    alert('Failed');
+                                    toast.error(data.message);
                                 }
-                            })
-                            .catch((err) => {
-                                console.log(err)
-                            })
+                            } catch (error) {
+                                toast.error(error.message);
+                            }
+                        }
+                    });
+                    paymentGateway.on('payment.failed', async function () {
+                        try {
+                            paymentGateway.close();
+                            const { data } = await axios.delete(`/api/v1/order/${_id}/trash`);
+                            if (data.success) {
+                                toast.error('Payment Failed! Please try again.');
+                            } else {
+                                toast.error(data.message);
+                            }
+                        } catch (error) {
+                            toast.error(error.message);   
                         }
                     });
 
-                    // 
-                    paymentObject.open();
+                    // Open Payment Gateway:-
+                    paymentGateway.open();
+                }
+                else {
+                    toast.error(data.message);
                 }
             }
         } catch (error) {

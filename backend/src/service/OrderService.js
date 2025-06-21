@@ -116,14 +116,29 @@ class OrderService {
         }
     }
 
-    async validatePayment(orderId, paymentId, signature) {
+    async validatePayment(paymentData) {
         try {
+            const { orderId, paymentId, signature, _id } = paymentData;
             const generatedSignature = generateSignature(orderId, paymentId);
             const isValid = generatedSignature === signature;
-            if (isValid) { // todo:-
-                // implement db operation to updte isPaid status from false -> true;
+
+            if (isValid) {
+                // If valid, update isPaid status from false -> true;
+                const updatedOrder = await this.orderRepository.updateOrderPaymentStatus(_id, isValid);
+            } else {
+                // else, delete the order from Database;
+                const deletedOrder = await this.orderRepository.destroy(_id);
             }
             return isValid;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async trashOrder(orderId) {
+        try {
+            const trashedOrder = await this.orderRepository.destroy(orderId);
+            return trashedOrder;
         } catch (error) {
             throw error;
         }
