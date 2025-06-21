@@ -6,7 +6,7 @@ const connectDB = async () => {
         mongoose.connection.on('connected', () => {
             console.log("MongoDB connected successfully");
         })
-        await mongoose.connect(`${serverConfig.MONGODB_URI}/GreenBasket`)
+        await mongoose.connect(`${serverConfig.MONGODB_URI}/GreenBasket`);
     } catch (error) {
         console.log("Error connecting MongoDB: ", error)
     }
