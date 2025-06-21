@@ -62,4 +62,47 @@ export const getOrdersBySellerId = async (req, res) => {
             error: error.message
         });
     }
-}; 
+};
+
+export const placeOnlinePaymentOrder = async (req, res) => {
+    try {
+        const orderData = req.body;
+        const order = await orderService.placeOnlinePaymentOrder({
+            ...orderData,
+            userId: req.user.userId
+        });
+        return res.status(201).json({
+            data: order,
+            success: true,
+            message: "Online payment order created successfully",
+            error: null
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: {},
+            success: false,
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+};
+
+export const verifyPayment = async (req, res) => {
+    try {
+        const { orderId, paymentId, signature } = req.body;
+        const response = await orderService.validatePayment(orderId, paymentId, signature);
+        return res.status(200).json({
+            data: response,
+            success: response,
+            message: response ? "success" : "failed",
+            error: null
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data: {},
+            success: false,
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+};

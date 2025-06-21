@@ -78,7 +78,40 @@ function CartPage() {
             }
             else {
                 // Online Payment Order Api Call;
-                // do something;
+                const { data } = await axios.post('/api/v1/order/place-online', {
+                    amount: 500
+                });
+                console.log(data.data);
+                if(data.success) {
+                    const paymentObject = new window.Razorpay({
+                        key: "rzp_test_XUtnumsDkV4at8",
+                        order_id: data.data.id,
+                        ...data.data,
+                        handler: function(response) {
+                            console.log(response)
+                            const options = {
+                                order_id: response.razorpay_order_id,
+                                payment_id: response.razorpay_payment_id,
+                                signature: response.razorpay_signature,
+                            }
+                            axios.post('/api/v1/order/verify-payment', options)
+                            .then((res) => {
+                                console.log(res)
+                                if(res.data.success) {
+                                    alert('Success');
+                                } else {
+                                    alert('Failed');
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err)
+                            })
+                        }
+                    });
+
+                    // 
+                    paymentObject.open();
+                }
             }
         } catch (error) {
             toast.error(error.message);

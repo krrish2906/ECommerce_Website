@@ -1,6 +1,7 @@
 import OrderRepository from "../repository/OrderRepository.js";
 import ProductRepository from "../repository/ProductRepository.js";
 import UserRepository from "../repository/UserRepository.js";
+import { createRazorpayOrder, generateSignature } from "../utils/razorpayUtils.js";
 
 class OrderService {
     constructor() {
@@ -28,7 +29,7 @@ class OrderService {
             // Add tax (considering 2% only i.e hardcoded);
             amount += Math.floor(amount * 0.02);
 
-            // Create the order;
+            // Create the order with paymentType: 'Cash On Delivery';
             const order = await this.orderRepository.create({
                 ...orderData, amount,
                 paymentType: 'Cash On Delivery'
@@ -74,6 +75,55 @@ class OrderService {
                 };
             });
             return sellerOrders;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async placeOnlinePaymentOrder(orderData) {
+        try {
+            // Check if user is a buyer/seller, if 'seller' can't proceed;
+            const user = await this.userRepository.findById(orderData.userId);
+            if (user.role === 'seller') {
+                throw new Error("Sellers are not allowed to place orders");
+            }
+
+            // Calculate total order amount;
+            let amount = 0;
+            for (const item of orderData.items) {
+                const product = await this.productRepository.findById(item.product);
+                const price = product.offerPrice ? product.offerPrice : product.price;
+                amount += price * item.quantity;
+            }
+
+            // Add tax (considering 2% only i.e hardcoded);
+            amount += Math.floor(amount * 0.02);
+            
+            // Create the order in MongoDB first with paymentType: 'Online Payment';
+            const order = await this.orderRepository.create({
+                ...orderData, amount,
+                paymentType: 'Online Payment'
+            });
+            
+            // Create Razorpay order using MongoDB order ID as receipt
+            const razorpayOrder = await createRazorpayOrder(amount, order._id.toString());
+            return {
+                order,
+                razorpayOrder
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async validatePayment(orderId, paymentId, signature) {
+        try {
+            const generatedSignature = generateSignature(orderId, paymentId);
+            const isValid = generatedSignature === signature;
+            if (isValid) { // todo:-
+                // implement db operation to updte isPaid status from false -> true;
+            }
+            return isValid;
         } catch (error) {
             throw error;
         }

@@ -36,3 +36,9 @@ export class AlreadyExistsError extends AppError {
         super(message, 409);
     }
 }
+
+export class RazorpayError extends AppError {
+    constructor(message = 'Payment processing failed') {
+        super(message, 502);
+    }
+}
