@@ -11,7 +11,11 @@ function Navbar() {
 
     const logout = async () => {
         try {
-            const { data } = await axios.post('/api/v1/user/logout');
+            const { data } = await axios.post('/api/v1/user/logout', null, {
+                validateStatus: function (status) {
+                    return status < 500; 
+                }
+            });
             if(data.success) {
                 setUser(null);
                 navigate('/');
