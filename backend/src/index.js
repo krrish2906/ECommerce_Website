@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ['http://localhost:5173','https://e-commerce-website-tau-six.vercel.app'],
+    origin: ['http://localhost:5173','https://ecommerce-website-k0ha.onrender.com'],
     credentials: true
 }));
 app.use('/api', ApiRoutes);
